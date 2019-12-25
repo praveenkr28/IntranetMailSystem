@@ -28,14 +28,14 @@ public class Serv_SignUp extends HttpServlet
             httpsession.putValue("name", httpservletrequest.getParameter("uname1"));
             u = httpsession.getValue("name").toString();
             rs = st.executeQuery("select * from signupdetails where uname='" + u + "' and  passwd='" + p + "'");
-			servletoutputstream.println("select * from signupdetails where uname='" + u + "' and  passwd='" + p + "'");
+			//servletoutputstream.println("select * from signupdetails where uname='" + u + "' and  passwd='" + p + "'");
             if(rs.next())
             {
                 httpservletresponse.sendRedirect("listoptions.html");
             } else
             {
-                servletoutputstream.println("<html><body bgcolor=white background=indtextb.jpg text=red><h2><i><b>ur not a valid user! Try again using correct Loginname & Password or try registering </b></i></h2></body></html>");
-                httpservletresponse.setHeader("Refresh", "3;URL=loginsc.html");
+                servletoutputstream.println("<html><body bgcolor=white background=indtextb.jpg text=red><h2><i><b>You are not a valid user! Try again using correct Loginname & Password or try registering </b></i></h2></body></html>");
+                httpservletresponse.setHeader("Refresh", "15;URL=loginsc.html");
             }
         }
         catch(Exception exception)

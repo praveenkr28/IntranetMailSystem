@@ -45,9 +45,7 @@ public class Serv_Send extends HttpServlet
             Class.forName("com.mysql.jdbc.Driver");
             System.out.println("Driver Loaded");
             con = DriverManager.getConnection("jdbc:mysql://localhost/intranet", "root", "");
-
-
-            System.out.println("Connection created");
+            log("Connection created");
             stmt = con.createStatement();
             scon = getServletContext();
             HttpSession httpsession = httpservletrequest.getSession(true);
@@ -60,115 +58,121 @@ public class Serv_Send extends HttpServlet
             String s3 = httpservletrequest.getParameter("bcc");
             String s4 = httpservletrequest.getParameter("s1");
             String s5 = httpservletrequest.getParameter("maildata");*/
-		List<FileItem> fields=upload.parseRequest(httpservletrequest);
-		Iterator it=fields.iterator();
-		while(it.hasNext())
-		{
-			FileItem fileitem=(FileItem)it.next();
-			if(fileitem.isFormField())
-			{	
-				if(fileitem.getFieldName().equals("to"))
-				{
-					s =fileitem.getString();
-				}
-				if(fileitem.getFieldName().equals("subject"))
-				{
-					s1 =fileitem.getString();
-				}
-				if(fileitem.getFieldName().equals("cc"))
-				{
-					s2 = fileitem.getString();
-				}
-				if(fileitem.getFieldName().equals("bcc"))
-				{
-					s3 = fileitem.getString();
-				}
-				if(fileitem.getFieldName().equals("s1"))
-				{
-					s4 = fileitem.getString();
-				}
-				if(fileitem.getFieldName().equals("maildata"))
-				{
-					s5 = fileitem.getString();
-				}
-			}
-			else
+			List<FileItem> fields=upload.parseRequest(httpservletrequest);
+			Iterator it=fields.iterator();
+			while(it.hasNext())
 			{
-				filename=fileitem.getName();
-				if(filename.equals(""))
-				{
-				
+				FileItem fileitem=(FileItem)it.next();
+				if(fileitem.isFormField())
+				{	
+					if(fileitem.getFieldName().equals("to"))
+					{
+						s =fileitem.getString();
+					}
+					if(fileitem.getFieldName().equals("subject"))
+					{
+						s1 =fileitem.getString();
+					}
+					if(fileitem.getFieldName().equals("cc"))
+					{
+						s2 = fileitem.getString();
+					}
+					if(fileitem.getFieldName().equals("bcc"))
+					{
+						s3 = fileitem.getString();
+					}
+					if(fileitem.getFieldName().equals("s1"))
+					{
+						s4 = fileitem.getString();
+					}
+					if(fileitem.getFieldName().equals("maildata"))
+					{
+						s5 = fileitem.getString();
+					}
 				}
 				else
 				{
-					File f=new File("python",fileitem.getName());
-					f.getAbsolutePath();
-					fileitem.write(f);
-					//filename=null;
+					filename=fileitem.getName();
+					if(filename.equals(""))
+					{
+					
+					}
+					else
+					{
+						File f=new File("python",fileitem.getName());
+						f.getAbsolutePath();
+						fileitem.write(f);
+						//filename=null;
+					}
+				}
+				
+			}
+			log("username="+s+s1);
+			StringTokenizer stringtokenizer = new StringTokenizer(s, ",");
+			mdate = String.valueOf(new Date());
+			while(stringtokenizer.hasMoreTokens()) 
+			{
+				str1 = stringtokenizer.nextToken();
+				st1 = con.createStatement();
+				rs1 = st1.executeQuery("select * from signupdetails where uname='" + str1 + "'");
+				if(rs1.next())
+				{
+					bool = true;
+				} else
+				{
+					bool = false;
+					pw.println("<html><head><script>{alert('Invalid Mail-to address - He is an unregistered user');window.history.go(-1);}</script></head></html>");
+				}
+				rs1.close();
+				st1.close();
+				if(bool && flag)
+				{
+					rs = stmt.executeQuery("Select max(mailid) from newcompose");
+					rs.next();
+					if(rs == null)
+					{
+						i = 1;
+					} else
+					{
+						i = rs.getInt(1);
+						i++;
+					}
+					rs.close();
+					st2 = con.createStatement();
+					log("St2 successful");
+					int j = st2.executeUpdate("insert into newcompose values(" + i + ",'" + mfrom + "','" + str1 + "','" + s1 + "','" + s2 + "','" + s3 + "','"+filename+"','" + s5 + "','inbox','" + mdate + "',0)");
+					if(j > 0)
+						pw.println("<html><body bgcolor=white background=indtextb.jpg text=blue><font color=blue><h3><i>Message has been sent to " + str1 + " </i></h3></font>");
+					else
+						pw.println("<html><body bgcolor=white background=indtextb.jpg text=blue><font color=red><h3><i>Some error in message sending</i></h3></font>");
+					st2.close();
 				}
 			}
-			
+			str1 = "";
+			i++;
+			st3 = con.createStatement();
+			log("St3 successful");
+			int k = st3.executeUpdate("insert into newcompose values(" + i + ",'" + mfrom + "','" + s2 + "','" + s1 + "','','" + s3 + "','','" + s5 + "','inbox','" + mdate + "', 0)");
+			if(k > 0)
+				pw.println("<html><body bgcolor=white background=indtextb.jpg text=blue><font color=blue><h3><i>Message has been sent to " + s2 + " </i></h3></font>");
+			else
+				pw.println("<html><body bgcolor=white background=indtextb.jpg text=blue><font color=red><h3><i>Some error in message sending</i></h3></font>");
+			st3.close();
+			pw.println("<form action=Serv_NewAddress><center>");
+			pw.println("<h3><a href=Serv_Compose>Compose</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<a href=Serv_Inbox>Goto Inbox</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<a href=Serv_NewAddress>Add Address</a>");
+			pw.println("</form></body></html>");
 		}
-			System.out.println("username="+s+s1);
-            StringTokenizer stringtokenizer = new StringTokenizer(s, ",");
-            mdate = String.valueOf(new Date());
-            while(stringtokenizer.hasMoreTokens()) 
-            {
-                str1 = stringtokenizer.nextToken();
-                st1 = con.createStatement();
-                rs1 = st1.executeQuery("select * from signupdetails where uname='" + str1 + "'");
-                if(rs1.next())
-                {
-                    bool = true;
-                } else
-                {
-                    bool = false;
-                    pw.println("<html><head><script>{alert('Invalid Mail-to address - He is an unregistered user');window.history.go(-1);}</script></head></html>");
-                }
-                rs1.close();
-                st1.close();
-                if(bool && flag)
-                {
-                    rs = stmt.executeQuery("Select max(mailid) from newcompose");
-                    rs.next();
-                    if(rs == null)
-                    {
-                        i = 1;
-                    } else
-                    {
-                        i = rs.getInt(1);
-                        i++;
-                    }
-                    rs.close();
-                    st2 = con.createStatement();
-                    System.out.println("St2 successful");
-                    int j = st2.executeUpdate("insert into newcompose values(" + i + ",'" + mfrom + "','" + str1 + "','" + s1 + "','" + s2 + "','" + s3 + "','"+filename+"','" + s5 + "','inbox','" + mdate + "',0)");
-                    if(j > 0)
-                        pw.println("<html><body bgcolor=white background=indtextb.jpg text=blue><font color=blue><h3><i>Message has been sent to " + str1 + " </i></h3></font>");
-                    st2.close();
-                }
-            }
-            str1 = "";
-            i++;
-            st3 = con.createStatement();
-            System.out.println("St3 successful");
-            int k = st3.executeUpdate("insert into newcompose values(" + i + ",'" + mfrom + "','" + s2 + "','" + s1 + "','','" + s3 + "','','" + s5 + "','inbox','" + mdate + "', 0)");
-            if(k > 0)
-                pw.println("<html><body bgcolor=white background=indtextb.jpg text=blue><font color=blue><h3><i>Message has been sent to " + s2 + " </i></h3></font>");
-            st3.close();
-            pw.println("<form action=Serv_NewAddress><center>");
-            pw.println("<h3><a href=Serv_Compose>Compose</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<a href=Serv_Inbox>Goto Inbox</a>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<a href=Serv_NewAddress>Add Address</a>");
-            pw.println("</form></body></html>");
-        }
-        catch(SQLException exception)
-        {
-            exception.printStackTrace();
-        }
+		catch(SQLException exception)
+		{
+			log(exception);
+			exception.printStackTrace();
+		}
 		catch(Exception exception)
-        {
-            exception.printStackTrace();
-        }
-    }
+		{
+			log(exception);
+			exception.printStackTrace();
+		}
+	}
 
     Statement stmt;
     Statement st1;

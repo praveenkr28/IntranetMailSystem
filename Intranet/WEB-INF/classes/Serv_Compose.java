@@ -58,7 +58,9 @@ public class Serv_Compose extends HttpServlet
         }
         catch(Exception exception)
         {
-            exception.printStackTrace();
+			  ServletOutputStream servletoutputstream = httpservletresponse.getOutputStream();
+            servletoutputstream.println(""+exception);
+			exception.printStackTrace();
         }
     }
 

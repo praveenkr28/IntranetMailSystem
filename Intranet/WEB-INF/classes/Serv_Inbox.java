@@ -67,6 +67,7 @@ public class Serv_Inbox extends HttpServlet
             servletoutputstream.println("<br><table border=2 cellpadding=4 cellspacing=5 width=80%><TR bgcolor=#00FFFF><th><font color=red>Status</th><TH><font color=red>From</TH><TH><font color=red>Subject</Th><TH><font color=red>Date</TH><TH>Attachment</TH></TR>");
             st1 = con.createStatement();
             rs1 = st1.executeQuery("select mailid,mailfrom,subject,maildate,mailst,fileno from newcompose where mailto='" + uname + "'");
+			log(""+rs1);
             int j = 0;
             while(rs1.next()) 
             {
@@ -79,14 +80,10 @@ public class Serv_Inbox extends HttpServlet
 				filename=rs1.getString(6);
                 if(sub == null)
                     sub = "[NONE]";
-				if(filename.equals(""))
-				{
+				if(filename.equals("")) 
 					msg="no attachment";
-				}
-				else
-				{
+				else 
 					msg="attachment";
-				}
                 if(sta == 1)
                 {
                     servletoutputstream.println("<tr><td><center><img src='button.gif' height=20 width=25 ></td><td>");
