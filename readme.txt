@@ -15,3 +15,17 @@
 8. Now Start Apache,MySql,Tomcat from Xampp Control Panel.
 	Enter 127.0.0.1:8080/welcome.html
 		Project will be running now.
+
+
+
+//Git Initializtion
+
+1. Create a new repository 
+echo "# IntranetMailSystem" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/praveenkr28/IntranetMailSystem.git
+git push -u origin master
+
+
